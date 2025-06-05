@@ -7,4 +7,3 @@ Feature: Search Hotels
     And I select "1" for room and "1" for adults
     And I hit "hotel" search button
     Then I capture and store hotel names and tariffs
-  ō

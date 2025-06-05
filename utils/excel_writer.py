@@ -1,6 +1,7 @@
 import openpyxl
 import os
 
+
 class ExcelWriter:
     @staticmethod
     def write_to_excel(filename="FlightHotelData.xlsx", sheet_name="Flights", data=[]):

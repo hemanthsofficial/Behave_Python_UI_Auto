@@ -5,13 +5,9 @@ from webdriver_manager.chrome import ChromeDriverManager
 
 class DriverFactory:
     @staticmethod
-    def init_driver():
+    def get_driver():
         options = webdriver.ChromeOptions()
         options.add_argument("--disable-notifications")
         driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
         driver.implicitly_wait(10)
         return driver
-
-    @staticmethod
-    def get_driver():
-        return DriverFactory.init_driver()

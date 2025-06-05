@@ -1,12 +1,14 @@
 from behave import given, when, then
 from pages.hotel_page import HotelPage
+from utils.common_utils import CommonUtils
 from utils.excel_writer import ExcelWriter
 
 
 @given('hotel search page is displayed')
 def step_open_hotel_page(context):
     try:
-        context.driver.get("https://www.makemytrip.com/hotels/")
+        context.driver.get(CommonUtils.get_url("hotel_url"))
+        context.driver.maximize_window()
         context.hotel_page = HotelPage(context.driver)
     except Exception as e:
         assert False, f"Failed to load hotel search page: {e}"
@@ -25,7 +27,7 @@ def step_select_hotel_dates(context, checkin, checkout):
     try:
         context.hotel_page.select_dates(checkin, checkout)
     except Exception as e:
-        assert False, f"Failed to select hotel check-in/check-out dates: {e}"
+        assert False, f"Failed to select hotel checkin/checkout dates: {e}"
 
 
 @when('I select "{rooms}" for room and "{adults}" for adults')
