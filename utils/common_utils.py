@@ -56,13 +56,13 @@ class CommonUtils:
         day, month, year = map(int, date_str.split("-"))
         month_year_to_select = datetime.date(year, month, day).strftime("%B %Y")
 
-        calendar_header_locator = CommonUtils.get_locator("HOTEL_PAGE", "calendar_header")
-        next_month_locator = CommonUtils.get_locator("HOTEL_PAGE", "next_month_btn")
+        CALENDAR_HEADER = (By.XPATH, CommonUtils.get_locator("FLIGHT_PAGE", "calendar_header"))
+        NEXT_MONTH_BTN = (By.XPATH, CommonUtils.get_locator("FLIGHT_PAGE", "next_month_btn"))
+        DATE_BTN = (By.XPATH, CommonUtils.get_locator("FLIGHT_PAGE", "date_btn"))
 
         while True:
             try:
-                calendar_header = self.remote_driver.find_element(By.XPATH, calendar_header_locator)
-                if calendar_header.text.strip() == month_year_to_select:
+                if self.remote_driver.CALENDAR_HEADER.text.strip() == month_year_to_select:
                     date_xpath = f"//div[@class='DayPicker-Month'][.//div[text()='{month_year_to_select}']]//p[text()='{day}']"
                     self.wait.until(EC.element_to_be_clickable((By.XPATH, date_xpath))).click()
                     break
@@ -70,17 +70,3 @@ class CommonUtils:
                     self.remote_driver.find_element(By.XPATH, next_month_locator).click()
             except Exception as e:
                 raise Exception(f"Failed to select date {date_str}: {e}")
-
-    # Select passengers and travel class
-    def select_passengers_and_class(self, adults, travel_class):
-        # Click on adult count increment (assumes default is 1)
-        for _ in range(int(adults) - 1):
-            self.wait.until(EC.element_to_be_clickable(
-                (By.XPATH, "//li[@data-cy='adults-2'] | //li[contains(text(),'adults')]"))).click()
-
-        # Select class
-        class_xpath = f"//li[contains(text(),'{travel_class.title()}')]"
-        self.wait.until(EC.element_to_be_clickable((By.XPATH, class_xpath))).click()
-
-        # Click apply
-        self.wait.until(EC.element_to_be_clickable((By.XPATH, "//button[text()='APPLY']"))).click()

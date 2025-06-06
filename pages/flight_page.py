@@ -4,11 +4,12 @@ from utils.common_utils import CommonUtils
 
 class FlightPage:
     def __init__(self, driver):
-        self.driver = driver
+        self.remote_driver = driver
         self.utils = CommonUtils(driver)
 
     # Locators
     section = "FLIGHT_PAGE"
+    CLOSE_MODAL = (By.XPATH, CommonUtils.get_locator(section, "close_modal"))
     FROM_INPUT = (By.ID, CommonUtils.get_locator(section, "from_input"))
     TO_INPUT = (By.ID, CommonUtils.get_locator(section, "to_input"))
     CITY_INPUT = (By.XPATH, CommonUtils.get_locator(section, "city_input"))
@@ -25,6 +26,7 @@ class FlightPage:
     # actions
     def enter_from_to_city(self, source, destination):
         try:
+            self.utils.wait_for_element_visible(self.CLOSE_MODAL).click()
             self.utils.wait_for_element_clickable(self.FROM_INPUT).click()
             self.utils.wait_for_element_visible(self.FROM_INPUT).send_keys(source)
             self.utils.wait_for_all_elements_visible(self.CITY_RESULT)[0].click()
