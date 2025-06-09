@@ -5,13 +5,21 @@ from utils.excel_writer import ExcelWriter
 
 
 @given('MakeMyTrip homepage is displayed')
-def step_open_make_my_trip(context):
+def step_open_make_my_trip_flight_page(context):
     try:
         context.driver.get(CommonUtils.get_url("flight_url"))
         context.driver.maximize_window()
         context.flight_page = FlightPage(context.driver)
     except Exception as e:
         assert False, f"Failed to load flight search page: {e}"
+
+
+@when('I select "{trip}" for trip type')
+def step_select_trip_type(context, trip):
+    try:
+        context.flight_page.select_trip_type(trip)
+    except Exception as e:
+        assert False, f"Failed to select trip type: {e}"
 
 
 @when('I enter "{source}" for from station & "{destination}" for to station')
@@ -22,12 +30,12 @@ def step_enter_cities(context, source, destination):
         assert False, f"Failed to enter source/destination: {e}"
 
 
-@when('I select "{departure_date}" for departure & "{return_date}" for return')
-def step_select_dates(context, departure_date, return_date):
+@when('I select "{departure_date}" for departure')
+def step_select_dates(context, departure_date):
     try:
-        context.flight_page.select_dates(departure_date, return_date)
+        context.flight_page.select_dates(departure_date)
     except Exception as e:
-        assert False, f"Failed to select departure/return date: {e}"
+        assert False, f"Failed to select departure date: {e}"
 
 
 @when('I select "{adults}" for travellers & "{travel_class}" for class')
@@ -50,7 +58,7 @@ def step_click_search_button(context, type):
 
 
 @then('I capture and store flight names')
-def step_capture_flights(context):
+def step_capture_flights_data(context):
     try:
         flights = context.flight_page.get_flight_names()
         print("Flight Names:", flights)

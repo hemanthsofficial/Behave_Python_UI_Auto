@@ -6,10 +6,11 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
+
 class CommonUtils:
     def __init__(self, driver):
         self.remote_driver = driver
-        self.wait = WebDriverWait(driver, 10)
+        self.wait = WebDriverWait(driver, 15)
 
     # Waits
     def wait_for_element_clickable(self, locator):
@@ -52,21 +53,41 @@ class CommonUtils:
         return locator_config[section].get(key)
 
     # date selection
-    def select_date(self, date_str):
+    def select_date(self, section, date_str):
         day, month, year = map(int, date_str.split("-"))
-        month_year_to_select = datetime.date(year, month, day).strftime("%B %Y")
+        target_month_year = datetime.date(year, month, day).strftime("%B %Y")
 
-        CALENDAR_HEADER = (By.XPATH, CommonUtils.get_locator("FLIGHT_PAGE", "calendar_header"))
-        NEXT_MONTH_BTN = (By.XPATH, CommonUtils.get_locator("FLIGHT_PAGE", "next_month_btn"))
-        DATE_BTN = (By.XPATH, CommonUtils.get_locator("FLIGHT_PAGE", "date_btn"))
+        CALENDAR_HEADER = (By.XPATH, CommonUtils.get_locator("COMMONS", "calendar_header"))
+        NEXT_MONTH_BTN = (By.XPATH, CommonUtils.get_locator("COMMONS", "next_month_btn"))
+        if section == "FLIGHT_PAGE":
+            DATE_BTN = (By.XPATH, CommonUtils.get_locator("FLIGHT_PAGE", "flight_date_btn"))
+        if section == "HOTEL_PAGE":
+            DATE_BTN = (By.XPATH, CommonUtils.get_locator("HOTEL_PAGE", "hotel_date_btn"))
 
-        while True:
-            try:
-                if self.remote_driver.CALENDAR_HEADER.text.strip() == month_year_to_select:
-                    date_xpath = f"//div[@class='DayPicker-Month'][.//div[text()='{month_year_to_select}']]//p[text()='{day}']"
-                    self.wait.until(EC.element_to_be_clickable((By.XPATH, date_xpath))).click()
+        try:
+            while True:
+                calendar_header = self.wait_for_element_visible(CALENDAR_HEADER)
+                current_month_year = calendar_header.text.strip()
+                if current_month_year == target_month_year:
+                    date_btn = self.wait_for_element_clickable(DATE_BTN)
+                    self.scroll_into_view(date_btn)
+                    date_btn.click()
                     break
                 else:
-                    self.remote_driver.find_element(By.XPATH, next_month_locator).click()
-            except Exception as e:
-                raise Exception(f"Failed to select date {date_str}: {e}")
+                    next_month_btn = self.wait_for_element_clickable(NEXT_MONTH_BTN)
+                    next_month_btn.click()
+
+        except Exception as e:
+            raise Exception(f"Failed to select date {date_str}: {e}")
+
+    # select list item
+    def select_list_item(self, city_name):
+        CITY_SUGGESTIONLIST = (By.XPATH, self.get_locator("COMMONS", "city_suggestionlist"))
+        cities = self.wait_for_all_elements_visible(CITY_SUGGESTIONLIST)
+        try:
+            for city in cities:
+                if city.text.strip().lower() == city_name.strip().lower():
+                    city.click()
+                    return
+        except Exception as e:
+            raise Exception(f"City '{city_name}' not found in suggestionlist: {e}")

@@ -5,57 +5,60 @@ from utils.common_utils import CommonUtils
 
 class HotelPage:
     def __init__(self, driver):
-        self.driver = driver
+        self.remote_driver = driver
         self.utils = CommonUtils(driver)
 
     # Locators
     section = "HOTEL_PAGE"
-    LOCATION_INPUT_BOX = (By.XPATH, CommonUtils.get_locator(section, "location_input_box"))
-    FIRST_SUGGESTION = (By.XPATH, CommonUtils.get_locator(section, "first_suggestion"))
-    SEARCH_BUTTON = (By.XPATH, CommonUtils.get_locator(section, "search_button"))
-    HOTEL_NAMES = (By.XPATH, CommonUtils.get_locator(section, "hotel_names"))
-    HOTEL_TARIFFS = (By.XPATH, CommonUtils.get_locator(section, "hotel_tariffs"))
-    GUEST_ROOM_BTN = (By.XPATH, CommonUtils.get_locator(section, "guest_room_btn"))
-    ROOM_PLUS_BTN = CommonUtils.get_locator(section, "room_plus_btn")
-    ADULT_PLUS_BTN = CommonUtils.get_locator(section, "adult_plus_btn")
-    APPLY_GUEST_BTN = (By.XPATH, CommonUtils.get_locator(section, "apply_guest_btn"))
+    CLOSE_MODAL = (By.XPATH, CommonUtils.get_locator("BASE_PAGE", "close_modal"))
+    CITY_TEXTBOX = (By.ID, CommonUtils.get_locator(section, "city_textbox"))
+    CITY_SUGGESTIONLIST = (By.XPATH, CommonUtils.get_locator("COMMONS", "city_suggestionlist"))
+    CHECKIN_DROPDOWN = (By.ID, CommonUtils.get_locator(section, "checkin_dropdown"))
+    CHECKOUT_DROPDOWN = (By.ID, CommonUtils.get_locator(section, "checkout_dropdown"))
+    ROOMS_GUESTS_DROPDOWN = (By.XPATH, CommonUtils.get_locator(section, "rooms_guests_dropdown"))
+    ROOM_DROPDOWN = CommonUtils.get_locator(section, "room_dropdown")
+    ADULT_DROPDOWN = CommonUtils.get_locator(section, "adults_dropdown")
+    APPLY_BTN = (By.XPATH, CommonUtils.get_locator("COMMONS", "apply_btn"))
+    SEARCH_BTN = (By.XPATH, CommonUtils.get_locator("COMMONS", "search_btn"))
 
     # Actions
     def enter_location(self, location):
         try:
-            self.utils.wait_for_element_clickable(self.LOCATION_INPUT_BOX).click()
-            input_box = self.utils.wait_for_element_visible(self.LOCATION_INPUT_BOX)
-            input_box.send_keys(location)
-            self.utils.wait_for_element_clickable(self.FIRST_SUGGESTION).click()
+            self.utils.wait_for_element_visible(self.CLOSE_MODAL).click()
+            self.utils.wait_for_element_clickable(self.CITY_TEXTBOX).click()
+            self.utils.wait_for_element_visible(self.CITY_TEXTBOX).send_keys(location)
+            self.utils.wait_for_all_elements_visible(self.CITY_SUGGESTIONLIST)[1].click()
         except Exception as e:
             raise Exception(f"Error entering hotel location('{location}'): {e}")
 
     def select_dates(self, checkin, checkout):
         try:
-            self.utils.select_date(checkin)
-            self.utils.select_date(checkout)
+            self.utils.wait_for_element_visible(self.CHECKIN_DROPDOWN).click()
+            self.utils.select_date(self.section, checkin)
+            self.utils.wait_for_element_visible(self.CHECKOUT_DROPDOWN).click()
+            self.utils.select_date(self.section, checkout)
         except Exception as e:
             raise Exception(f"Error selecting checkin('{checkin}')/checkout('{checkout}') dates: {e}")
 
     def select_room_and_guests(self, rooms, adults):
         try:
-            self.utils.wait_for_element_clickable(self.GUEST_ROOM_BTN).click()
+            self.utils.wait_for_element_clickable(self.ROOMS_GUESTS_DROPDOWN).click()
 
             # Rooms selection
             for _ in range(1, rooms):  # Already 1 by default
-                self.remote_driver.find_element(By.XPATH, self.ROOM_PLUS_BTN).click()
+                self.remote_driver.find_element(By.XPATH, self.ROOM_DROPDOWN).click()
 
             # Adults selection
             for _ in range(1, adults):  # Already 1 by default
-                self.remote_driver.find_element(By.XPATH, self.ADULT_PLUS_BTN).click()
+                self.remote_driver.find_element(By.XPATH, self.ADULT_DROPDOWN).click()
 
-            self.remote_driver.find_element(*self.APPLY_GUEST_BTN).click()
+            self.remote_driver.find_element(*self.APPLY_BTN).click()
         except Exception as e:
             raise Exception(f"Error selecting {rooms} room(s) and {adults} adult(s): {e}")
 
     def click_search(self):
         try:
-            self.utils.wait_for_element_clickable(self.SEARCH_BUTTON).click()
+            self.utils.wait_for_element_clickable(self.SEARCH_BTN).click()
         except Exception as e:
             raise Exception(f"Error clicking search button: {e}")
 

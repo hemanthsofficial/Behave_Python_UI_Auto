@@ -5,7 +5,7 @@ from utils.excel_writer import ExcelWriter
 
 
 @given('hotel search page is displayed')
-def step_open_hotel_page(context):
+def step_open_make_my_trip_hotel_page(context):
     try:
         context.driver.get(CommonUtils.get_url("hotel_url"))
         context.driver.maximize_window()
@@ -15,7 +15,7 @@ def step_open_hotel_page(context):
 
 
 @when('I enter "{location}" for location')
-def step_enter_hotel_location(context, location):
+def step_enter_location(context, location):
     try:
         context.hotel_page.enter_location(location)
     except Exception as e:
@@ -23,7 +23,7 @@ def step_enter_hotel_location(context, location):
 
 
 @when('I select "{checkin}" for check-in and "{checkout}" for check-out')
-def step_select_hotel_dates(context, checkin, checkout):
+def step_select_dates(context, checkin, checkout):
     try:
         context.hotel_page.select_dates(checkin, checkout)
     except Exception as e:
@@ -42,7 +42,7 @@ def step_select_guests(context, rooms, adults):
 # @when('I hit "{type}" search button')
 
 @then('I capture and store hotel names and tariffs')
-def step_capture_hotel_data(context):
+def step_capture_hotels_data(context):
     try:
         hotel_data = context.hotel_page.get_hotel_data()
         print("Hotels and Tariffs:")
