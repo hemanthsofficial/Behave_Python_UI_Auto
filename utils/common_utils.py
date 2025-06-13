@@ -1,6 +1,7 @@
 import configparser
 import datetime
 import os
+
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
@@ -30,6 +31,10 @@ class CommonUtils:
     def wait_for_element_present(self, locator):
         logger.info(f"Waiting for element to be present: {locator}")
         return self.wait.until(EC.presence_of_element_located(locator))
+
+    def wait_for_all_elements_present(self, locator):
+        logger.info(f"Waiting for all elements to be present: {locator}")
+        return self.wait.until(EC.presence_of_all_elements_located(locator))
 
     def scroll_into_view(self, element):
         logger.info("Scrolling into view")
@@ -73,10 +78,12 @@ class CommonUtils:
                 calendar_header = self.wait_for_element_visible(CALENDAR_HEADER)
                 current_month_year = calendar_header.text.strip()
                 if current_month_year == target_month_year:
-                    date_btn = self.wait_for_element_clickable(DATE_BTN)
-                    self.scroll_into_view(date_btn)
-                    date_btn.click()
-                    break
+                    date_btn = self.wait_for_all_elements_visible(DATE_BTN)
+                    for date in date_btn:
+                        if date.text == day:
+                            self.scroll_into_view(date)
+                            date.click()
+                            break
                 else:
                     next_month_btn = self.wait_for_element_clickable(NEXT_MONTH_BTN)
                     next_month_btn.click()
@@ -84,9 +91,9 @@ class CommonUtils:
             logger.error(f"Failed to select date {date_str}: {e}", exc_info=True)
             raise Exception(f"Failed to select date {date_str}: {e}")
 
-    def select_list_item(self, city_name):
+    def select_list_item(self, section, city_name):
         logger.info(f"Selecting city from list: {city_name}")
-        CITY_SUGGESTIONLIST = (By.XPATH, self.get_locator("COMMONS", "city_suggestionlist"))
+        CITY_SUGGESTIONLIST = (By.XPATH, self.get_locator(section, f"{section.lower()}_city_suggestionlist"))
         cities = self.wait_for_all_elements_visible(CITY_SUGGESTIONLIST)
         try:
             for city in cities:

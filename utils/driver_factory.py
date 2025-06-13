@@ -3,6 +3,7 @@ from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 
 from utils.logger import get_logger
+
 logger = get_logger(__name__)
 
 
